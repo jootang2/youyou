@@ -8,6 +8,8 @@ import DeploymentAdder from './_components/DeploymentAdder';
 import ProjectEditor from './_components/ProjectEditor';
 import MessageAdder from './_components/MessageAdder';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 

@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import AdminLogout from '../_components/AdminLogout';
 import ProjectAdder from '../_components/ProjectAdder';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboardPage() {
   const projects = await prisma.project.findMany({
     include: {

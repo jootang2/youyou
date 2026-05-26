@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  name              String
+  buyer             String
+  status            String       @default("active")
+  prodUrl           String
+  previewVersion    String
+  previewUrl        String
+  devUrl            String       @default("")  // 유유 작업 중인 Vercel preview URL
+  devBranch         String       @default("preview")  // 작업 브랜치 (기본: preview)
+  repoUrl           String       @default("")  // GitHub repo URL — 나중에 연결
+  vercelProjectId   String       @default("")  // Vercel project ID — 나중에 연결
+  lastDeployCommit  String
+  lastDeployTime    String
+  openRequests      Int          @default(0)
+  pendingApproval   Int          @default(0)
+  createdAt         DateTime     @default(now())
+
+  accessKeys        AccessKey[]
+  requests          Request[]
+  messages          Message[]
+  deployments       Deployment[]
+}
+
+model AccessKey {
+  id        String   @id @default(cuid())
+  keyHash   String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Request {
+  id          String   @id @default(cuid())
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String
+  title       String
+  status      String   @default("")
+  statusLabel String
+  desc        String
+  hasAction   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  type      String   // 'agent' | 'buyer' | 'system'
+  text      String
+  processed Boolean  @default(false)  // 유유가 처리 완료한 메시지 여부
+  createdAt DateTime @default(now())
+}
+
+model Deployment {
+  id          String   @id @default(cuid())
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String
+  env         String   // 'production' | 'preview'
+  status      String   // 'success' | 'fail' | 'pending'
+  statusLabel String
+  version     String
+  title       String
+  trigger     String
+  deployedAt  DateTime
+  duration    String
+  url         String   @default("")
+}
